@@ -48,8 +48,8 @@ fn graph_out(transfers: apecoin::Transfers) -> Result<EntityChanges, Error> {
         row.set("logIndex", transfer.log_index);
         row.set("txHash", &transfer.tx_hash);
         row.set("amount", &transfer.amount);
-        row.set("sender", &transfer.to);
-        row.set("receiver", &transfer.from);
+        row.set("sender", &transfer.from);
+        row.set("receiver", &transfer.to);
     }
     let entity_changes = tables.to_entity_changes();
     log::info!("Entity changes: {:?}", entity_changes);
