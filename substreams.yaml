@@ -3,6 +3,9 @@ package:
   name: 'apecoin'
   version: v1.0.0
 
+imports:
+  entity: https://github.com/streamingfast/substreams-entity-change/releases/download/v0.2.1/substreams-entity-change-v0.2.1.spkg
+
 protobuf:
   files:
     - apecoin.proto
