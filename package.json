@@ -1,0 +1,13 @@
+{
+  "name": "apecoin",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ itsjerryokolo/apecoin",
+    "create-local": "graph create --node http://localhost:8020/ itsjerryokolo/apecoin",
+    "remove-local": "graph remove --node http://localhost:8020/ itsjerryokolo/apecoin",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 itsjerryokolo/apecoin",
+    "test": "graph test"
+  },
+  "dependencies": { "@graphprotocol/graph-cli": "0.51.1" }
+}

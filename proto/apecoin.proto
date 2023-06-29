@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package eth.apecoin.v1;
+
+message Transfer {
+  string from = 2;
+  string to = 3;
+  string amount = 4;
+  string tx_hash = 10;
+  uint64 block_number = 11;
+  uint64 timestamp = 12;
+  uint32 log_index = 13;
+}
+
+message Transfers {
+  repeated Transfer transfers = 1;
+}
