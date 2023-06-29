@@ -9,7 +9,7 @@ use pb::eth::apecoin::v1 as apecoin;
 use substreams::{log, Hex};
 use substreams_entity_change::{pb::entity::EntityChanges, tables::Tables};
 use substreams_ethereum::pb::eth;
-use utils::{constants::APECOIN_CONTRACT, math::to_big_decimal};
+use utils::constants::APECOIN_CONTRACT;
 
 use substreams::errors::Error;
 
@@ -26,9 +26,7 @@ fn map_transfer(block: eth::v2::Block) -> Result<apecoin::Transfers, Error> {
                     to: append_0x(&Hex(transfer.to).to_string()),
                     block_number: block.number,
                     timestamp: block.timestamp_seconds(),
-                    amount: to_big_decimal(transfer.value.to_string().as_str())
-                        .unwrap()
-                        .to_string(),
+                    amount: transfer.value.to_string(),
                     tx_hash: append_0x(&Hex(&log.receipt.transaction.hash).to_string()),
                     log_index: log.index(),
                 }
