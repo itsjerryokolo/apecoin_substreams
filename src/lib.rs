@@ -157,7 +157,7 @@ pub fn graph_out(
             Operation::Create => tables.create_row("Account", address),
             Operation::Update => todo!(),
             Operation::Delete => todo!(),
-            x => panic!("unsupported opeation {:?}", x),
+            x => panic!("unsupported operation {:?}", x),
         };
     }
 
