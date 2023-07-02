@@ -78,27 +78,24 @@ pub fn store_accounts(
     o: StoreSetProto<apecoin::Account>,
 ) {
     for approval in i.approvals {
-        match approval.owner {
-            Some(value) => {
-                o.set(0, format!("Owner: {}", &value.address), &value);
-            }
-            None => continue,
-        }
+        o.set(
+            0,
+            format!("Owner: {}", &approval.owner.as_ref().unwrap().address),
+            &approval.owner.as_ref().unwrap(),
+        );
     }
     for transfer in i2.transfers {
-        match transfer.from {
-            Some(value) => {
-                o.set(0, format!("Sender: {}", &value.address), &value);
-            }
-            None => continue,
-        }
+        o.set(
+            0,
+            format!("Sender: {}", &transfer.from.as_ref().unwrap().address),
+            &transfer.from.as_ref().unwrap(),
+        );
 
-        match transfer.to {
-            Some(value) => {
-                o.set(0, format!("Receiver: {}", &value.address), &value);
-            }
-            None => continue,
-        }
+        o.set(
+            0,
+            format!("Receiver: {}", &transfer.to.as_ref().unwrap().address),
+            &transfer.to.as_ref().unwrap(),
+        );
     }
 }
 
