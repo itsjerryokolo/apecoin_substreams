@@ -26,9 +26,39 @@ modules:
     output:
       type: proto:eth.apecoin.v1.Transfers
 
+  -  name: map_approval
+     kind: map
+     initialBlock: 14204533
+     inputs:
+       - source: sf.ethereum.type.v2.Block
+     output:
+      type: proto:eth.apecoin.v1.Approvals
+
+  - name: store_accounts
+    kind: store
+    initialBlock: 14204533
+    updatePolicy: set
+    valueType: proto:eth.apecoin.v1.Account
+    inputs:
+      - map: map_transfer
+      - map: map_approval
+
+  - name: store_token
+    kind: store
+    initialBlock: 14204533
+    updatePolicy: set
+    valueType: proto:eth.apecoin.v1.Token
+    inputs:
+      - source: sf.ethereum.type.v2.Block 
+    
   - name: graph_out
     kind: map
     inputs:
       - map: map_transfer
+      - map: map_approval
+      - store: store_accounts
+        mode: deltas
+      - store: store_token
+        mode: deltas
     output:
       type: proto:substreams.entity.v1.EntityChanges

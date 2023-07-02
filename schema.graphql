@@ -1,10 +1,33 @@
-type Transfer @entity {
+type Account @entity {
   id: ID!
-  sender: String!
-  receiver: String!
+}
+
+type Transfer @entity(immutable: true) {
+  id: ID!
+  sender: Account
+  receiver: Account!
   amount: String!
   timestamp: BigInt!
   txHash: String!
   blockNumber: BigInt!
   logIndex: BigInt!
+}
+
+type Approval @entity(immutable: true) {
+  id: ID!
+  spender: String!
+  owner: Account!
+  amount: String!
+  timestamp: BigInt!
+  txHash: String!
+  blockNumber: BigInt!
+  logIndex: BigInt!
+}
+
+type Token @entity {
+  id: ID!
+  name: String!
+  address: String!
+  symbol: String!
+  decimals: String!
 }

@@ -3,9 +3,9 @@ syntax = "proto3";
 package eth.apecoin.v1;
 
 message Transfer {
-  string from = 2;
-  string to = 3;
-  string amount = 4;
+  Account from = 1;
+  Account to = 2;
+  string amount = 3;
   string tx_hash = 10;
   uint64 block_number = 11;
   uint64 timestamp = 12;
@@ -14,4 +14,29 @@ message Transfer {
 
 message Transfers {
   repeated Transfer transfers = 1;
+}
+
+message Approval {
+  string spender = 1;
+  Account owner = 2;
+  string amount = 3;
+  string tx_hash = 10;
+  uint64 block_number = 11;
+  uint64 timestamp = 12;
+  uint32 log_index = 13;
+}
+
+message Approvals {
+  repeated Approval approvals = 1;
+}
+
+message Account {
+  string address = 1;
+}
+
+message Token {
+  string name = 1;
+  string address = 2;
+  string decimal = 3;
+  string symbol = 4;
 }
