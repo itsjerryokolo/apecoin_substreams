@@ -10,7 +10,7 @@ stream: build
 
 .PHONY: tt
 tt: 
-	substreams run -e $(ENDPOINT) substreams.yaml map_transfer -s 14204533 -t +50 -o json
+	substreams run -e $(ENDPOINT) substreams.yaml graph_out -s 14276400 -t +100 -o json
 
 .PHONY: codegen
 codegen:

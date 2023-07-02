@@ -20,7 +20,7 @@ binaries:
 modules:
   - name: map_transfer
     kind: map
-    initialBlock: 14204533
+    initialBlock: 14204532
     inputs:
       - source: sf.ethereum.type.v2.Block
     output:
@@ -28,7 +28,7 @@ modules:
 
   -  name: map_approval
      kind: map
-     initialBlock: 14204533
+     initialBlock: 14204532
      inputs:
        - source: sf.ethereum.type.v2.Block
      output:
@@ -36,7 +36,7 @@ modules:
 
   - name: store_accounts
     kind: store
-    initialBlock: 14204533
+    initialBlock: 14204532
     updatePolicy: set
     valueType: proto:eth.apecoin.v1.Account
     inputs:
@@ -45,7 +45,7 @@ modules:
 
   - name: store_token
     kind: store
-    initialBlock: 14204533
+    initialBlock: 14204532
     updatePolicy: set
     valueType: proto:eth.apecoin.v1.Token
     inputs:

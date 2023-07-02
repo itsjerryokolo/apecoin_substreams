@@ -155,7 +155,7 @@ pub fn graph_out(
 
         match delta.operation {
             Operation::Create => tables.create_row("Account", address),
-            Operation::Update => todo!(),
+            Operation::Update => continue,
             Operation::Delete => todo!(),
             x => panic!("unsupported operation {:?}", x),
         };
