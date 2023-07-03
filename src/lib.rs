@@ -73,18 +73,11 @@ pub fn map_approval(block: eth::v2::Block) -> Result<apecoin::Approvals, Error> 
 
 #[substreams::handlers::store]
 pub fn store_accounts(
-    i: apecoin::Approvals,
-    i2: apecoin::Transfers,
+    i0: apecoin::Transfers,
+    i1: apecoin::Approvals,
     o: StoreSetProto<apecoin::Account>,
 ) {
-    for approval in i.approvals {
-        o.set(
-            0,
-            format!("Owner: {}", &approval.owner.as_ref().unwrap().address),
-            &approval.owner.as_ref().unwrap(),
-        );
-    }
-    for transfer in i2.transfers {
+    for transfer in i0.transfers {
         o.set(
             0,
             format!("Sender: {}", &transfer.from.as_ref().unwrap().address),
@@ -95,6 +88,13 @@ pub fn store_accounts(
             0,
             format!("Receiver: {}", &transfer.to.as_ref().unwrap().address),
             &transfer.to.as_ref().unwrap(),
+        );
+    }
+    for approval in i1.approvals {
+        o.set(
+            0,
+            format!("Owner: {}", &approval.owner.as_ref().unwrap().address),
+            &approval.owner.as_ref().unwrap(),
         );
     }
 }
