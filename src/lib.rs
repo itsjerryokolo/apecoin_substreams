@@ -2,11 +2,15 @@ mod abi;
 mod pb;
 mod utils;
 
+use std::str::FromStr;
+
 use crate::utils::helper::{append_0x, generate_id};
 use abi::abi::apecoin::v1 as apecoin_events;
 
 use pb::eth::apecoin::v1 as apecoin;
 use substreams::pb::substreams::store_delta::Operation;
+use substreams::scalar::BigInt;
+use substreams::store::{DeltaBigInt, StoreAdd, StoreAddBigInt};
 use substreams::{
     log,
     store::{DeltaProto, Deltas, StoreNew, StoreSet, StoreSetProto},
@@ -15,11 +19,10 @@ use substreams::{
 
 use substreams_entity_change::{pb::entity::EntityChanges, tables::Tables};
 use substreams_ethereum::pb::eth;
+use substreams_ethereum::NULL_ADDRESS;
 use utils::constants::APECOIN_CONTRACT;
 
 use substreams::errors::Error;
-
-substreams_ethereum::init!();
 
 #[substreams::handlers::map]
 pub fn map_transfer(block: eth::v2::Block) -> Result<apecoin::Transfers, Error> {
@@ -72,29 +75,18 @@ pub fn map_approval(block: eth::v2::Block) -> Result<apecoin::Approvals, Error> 
 }
 
 #[substreams::handlers::store]
-pub fn store_accounts(
-    i0: apecoin::Transfers,
-    i1: apecoin::Approvals,
-    o: StoreSetProto<apecoin::Account>,
-) {
+pub fn store_account_holdings(i0: apecoin::Transfers, o: StoreAddBigInt) {
     for transfer in i0.transfers {
-        o.set(
+        o.add(
             0,
-            format!("Sender: {}", &transfer.from.as_ref().unwrap().address),
-            &transfer.from.as_ref().unwrap(),
+            format!("Account: {}", &transfer.from.as_ref().unwrap().address),
+            BigInt::from_str(transfer.amount.as_str()).unwrap().neg(),
         );
 
-        o.set(
+        o.add(
             0,
-            format!("Receiver: {}", &transfer.to.as_ref().unwrap().address),
-            &transfer.to.as_ref().unwrap(),
-        );
-    }
-    for approval in i1.approvals {
-        o.set(
-            0,
-            format!("Owner: {}", &approval.owner.as_ref().unwrap().address),
-            &approval.owner.as_ref().unwrap(),
+            format!("Account: {}", &transfer.to.as_ref().unwrap().address),
+            BigInt::from_str(transfer.amount.as_str()).unwrap(),
         );
     }
 }
@@ -116,10 +108,27 @@ pub fn store_token(block: eth::v2::Block, o: StoreSetProto<apecoin::Token>) {
 pub fn graph_out(
     transfers: apecoin::Transfers,
     approvals: apecoin::Approvals,
-    accounts: Deltas<DeltaProto<apecoin::Account>>,
+    account_holdings: Deltas<DeltaBigInt>,
     tokens: Deltas<DeltaProto<apecoin::Token>>,
 ) -> Result<EntityChanges, Error> {
     let mut tables = Tables::new();
+    for delta in account_holdings.deltas {
+        let address = delta.key.as_str().split(":").last().unwrap().trim();
+
+        match delta.operation {
+            Operation::Create => {
+                let row = tables.create_row("Account", address);
+
+                row.set("holdings", delta.old_value);
+            }
+            Operation::Update => {
+                let row = tables.update_row("Account", address);
+                row.set("holdings", delta.new_value);
+            }
+            Operation::Delete => todo!(),
+            x => panic!("unsupported operation {:?}", x),
+        };
+    }
 
     for transfer in &transfers.transfers {
         let id: String = generate_id(&transfer.tx_hash, &transfer.log_index.to_string().as_str());
@@ -145,17 +154,6 @@ pub fn graph_out(
         row.set("logIndex", approval.log_index);
         row.set("txHash", &approval.tx_hash);
         row.set("amount", &approval.amount);
-    }
-
-    for delta in accounts.deltas {
-        let address = delta.key.as_str().split(":").last().unwrap().trim();
-
-        match delta.operation {
-            Operation::Create => tables.create_row("Account", address),
-            Operation::Update => continue,
-            Operation::Delete => todo!(),
-            x => panic!("unsupported operation {:?}", x),
-        };
     }
 
     for delta in tokens.deltas {

@@ -34,14 +34,22 @@ modules:
      output:
       type: proto:eth.apecoin.v1.Approvals
 
-  - name: store_accounts
+  # - name: store_accounts
+  #   kind: store
+  #   initialBlock: 14204532
+  #   updatePolicy: set
+  #   valueType: proto:eth.apecoin.v1.Account
+  #   inputs:
+  #     - map: map_transfer
+  #     - map: map_approval
+
+  - name: store_account_holdings
     kind: store
     initialBlock: 14204532
-    updatePolicy: set
-    valueType: proto:eth.apecoin.v1.Account
+    updatePolicy: add
+    valueType: bigint
     inputs:
       - map: map_transfer
-      - map: map_approval
 
   - name: store_token
     kind: store
@@ -56,7 +64,9 @@ modules:
     inputs:
       - map: map_transfer
       - map: map_approval
-      - store: store_accounts
+      # - store: store_accounts
+      #   mode: deltas
+      - store: store_account_holdings
         mode: deltas
       - store: store_token
         mode: deltas

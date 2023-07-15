@@ -1,5 +1,6 @@
 type Account @entity {
   id: ID!
+  holdings: BigInt!
 }
 
 type Transfer @entity(immutable: true) {
