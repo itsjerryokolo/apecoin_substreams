@@ -19,7 +19,6 @@ use substreams::{
 
 use substreams_entity_change::{pb::entity::EntityChanges, tables::Tables};
 use substreams_ethereum::pb::eth;
-use substreams_ethereum::NULL_ADDRESS;
 use utils::constants::APECOIN_CONTRACT;
 
 use substreams::errors::Error;
