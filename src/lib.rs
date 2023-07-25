@@ -38,7 +38,9 @@ pub fn map_transfer(block: eth::v2::Block) -> Result<apecoin::Transfers, Error> 
                     }),
                     block_number: block.number,
                     timestamp: block.timestamp_seconds(),
-                    amount: transfer.value.to_string(),
+                    amount: to_big_decimal(transfer.value.to_string().as_str())
+                        .unwrap()
+                        .to_string(),
                     tx_hash: append_0x(&Hex(&log.receipt.transaction.hash).to_string()),
                     log_index: log.index(),
                 }
@@ -62,7 +64,9 @@ pub fn map_approval(block: eth::v2::Block) -> Result<apecoin::Approvals, Error> 
                     }),
                     block_number: block.number,
                     timestamp: block.timestamp_seconds(),
-                    amount: approval.value.to_string(),
+                    amount: to_big_decimal(approval.value.to_string().as_str())
+                        .unwrap()
+                        .to_string(),
                     tx_hash: append_0x(&Hex(&log.receipt.transaction.hash).to_string()),
                     log_index: log.index(),
                 }

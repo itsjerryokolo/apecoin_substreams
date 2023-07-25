@@ -15,7 +15,7 @@ Make sure you have the latest versions of the following installed:
 
 ```rust
 pub const CONTRACT_ADDRESS: &str = "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D";
-pub const START_BLOCK: u64 = 1521531;
+pub const START_BLOCK: u64 = 14204532;
 ```
 
 ### 2. Update the START_BLOCK, CONTRACT_ADDRESS and contract metadata in the store_token function
