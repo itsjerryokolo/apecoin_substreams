@@ -38,7 +38,7 @@ modules:
     kind: store
     initialBlock: 14204532
     updatePolicy: add
-    valueType: bigint
+    valueType: bigdecimal
     inputs:
       - map: map_transfer
 

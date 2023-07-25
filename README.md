@@ -1,19 +1,24 @@
 # Apecoin Substreams
 
-Quickstart
+## Quickstart
+
 Make sure you have the latest versions of the following installed:
 
-Rust Link to install
-Graph-cli Link to install
-substreams-cli Link to install
-make Link to install
+- Rust
+- Make
+- graph-cli
+- substreams-cli
 
-Although this substreams is tracking the Apecoin Contract, you can use this as a template for any ERC20 token. You will need to update the CONTRACT_ADDRESS, START_BLOCK and the contract metadata in the `store_token` function.
+Although this substreams is tracking the Apecoin Contract, you can use this as a template for any ERC20 token. You will need to update the `CONTRACT_ADDRESS`, `START_BLOCK` and the contract metadata in the `store_token` function.
 
-1. Update the CONTRACT_ADDRESS & START_BLOCK variables in src/utils/constants.rs
+### Update the CONTRACT_ADDRESS & START_BLOCK variables in `src/utils/constants.rs`
+
+```rust
 pub const CONTRACT_ADDRESS: &str = "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D";
+pub const START_BLOCK: u64 = 1521531;
+```
 
-3. Update the START_BLOCK, CONTRACT_ADDRESS and contract metadata in the store_token function
+### Update the START_BLOCK, CONTRACT_ADDRESS and contract metadata in the store_token function
 
 ```rust
 #[substreams::handlers::store]
@@ -30,8 +35,9 @@ pub fn store_token(block: eth::v2::Block, o: StoreSetProto<apecoin::Token>) {
 }
 ```
 
-4. Update the initialBlock params for all modules within substreams.yaml
+### Update the initialBlock params for all modules within substreams.yaml
 
+```yaml
   - name: map_transfers
     kind: map
     initialBlock: 14204533
@@ -39,19 +45,24 @@ pub fn store_token(block: eth::v2::Block, o: StoreSetProto<apecoin::Token>) {
       - source: sf.ethereum.type.v2.Block
     output:
       type: proto:apecoin.Transfers
+```
 
-5. Compile the Project with `make build`
+### Compile the Project with  `make build`
+
 We now need to recompile our WASM binary with the new changes we made to the rust files.
 
-6. Pack the spkg with `make package`
+### Pack the spkg with `make package`
+
 We need to bundle the protobuf definitions and the WASM binary into a single file. This is what we will deploy the subgraph.
 
-7. Deploy the subgraph with `graph deploy`
+### Deploy the subgraph with `graph deploy`
+
 Modify the package.json to point to your subgraph name and endpoint.
 This endpoint will change if you are deploying to the hosted service or decentralized network. But replace this with the command that is appropriate for your setup.
 
-8. Enjoy your data!
-Schema
+### Schema
+
+```graphql
 type Account @entity {
   id: ID!
   holdings: BigInt!
@@ -93,6 +104,7 @@ type Token @entity {
   transfers: [Token!]! derivedFrom(field: "token")
   approvals: [Token!]! derivedFrom(field: "token")
 }
+```
 
 7. Data Flow
 

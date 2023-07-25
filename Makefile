@@ -6,11 +6,11 @@ build:
 
 .PHONY: stream
 stream: build
-	substreams run -e $(ENDPOINT) substreams.yaml graph_out -s 14204533 -t +500 -o json
+	substreams run -e $(ENDPOINT) substreams.yaml store_account_holdings -s 14204533 -t +500 --debug-modules-output
 
 .PHONY: tt
 tt: 
-	substreams run -e $(ENDPOINT) substreams.yaml graph_out -s 14276400 -t +100 -o json
+	substreams run -e $(ENDPOINT) substreams.yaml graph_out -s 14276500 -t +2000 -o json
 
 .PHONY: codegen
 codegen:

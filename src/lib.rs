@@ -2,14 +2,11 @@ mod abi;
 mod pb;
 mod utils;
 
-use std::str::FromStr;
-
 use crate::utils::helper::{append_0x, generate_id};
 use abi::abi::apecoin::v1 as apecoin_events;
 
 use pb::eth::apecoin::v1 as apecoin;
 use substreams::pb::substreams::store_delta::Operation;
-use substreams::scalar::BigDecimal;
 use substreams::store::{DeltaBigDecimal, StoreAdd, StoreAddBigDecimal};
 use substreams::{
     log,
@@ -22,6 +19,7 @@ use substreams_ethereum::pb::eth;
 use utils::constants::{CONTRACT_ADDRESS, START_BLOCK};
 
 use substreams::errors::Error;
+use utils::math::to_big_decimal;
 
 #[substreams::handlers::map]
 pub fn map_transfer(block: eth::v2::Block) -> Result<apecoin::Transfers, Error> {
@@ -76,19 +74,17 @@ pub fn map_approval(block: eth::v2::Block) -> Result<apecoin::Approvals, Error> 
 #[substreams::handlers::store]
 pub fn store_account_holdings(i0: apecoin::Transfers, o: StoreAddBigDecimal) {
     for transfer in i0.transfers {
-        let val_dec = BigDecimal::from_str(transfer.amount.as_str())
-            .unwrap()
-            .with_prec(100);
+        let amount_decimal = to_big_decimal(transfer.amount.as_str()).unwrap();
         o.add(
             0,
             format!("Account: {}", &transfer.from.as_ref().unwrap().address),
-            val_dec.neg(),
+            amount_decimal.neg(),
         );
 
         o.add(
             0,
             format!("Account: {}", &transfer.to.as_ref().unwrap().address),
-            val_dec,
+            amount_decimal,
         );
     }
 }
