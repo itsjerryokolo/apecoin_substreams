@@ -36,6 +36,6 @@ type Token @entity {
   address: String!
   symbol: String!
   decimals: String!
-  transfers: [Token!]! derivedFrom(field: "token")
-  approvals: [Token!]! derivedFrom(field: "token")
+  transfers: [Transfer!]! @derivedFrom(field: "token")
+  approvals: [Approval!]! @derivedFrom(field: "token")
 }

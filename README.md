@@ -11,14 +11,14 @@ Make sure you have the latest versions of the following installed:
 
 Although this substreams is tracking the Apecoin Contract, you can use this as a template for any ERC20 token. You will need to update the `CONTRACT_ADDRESS`, `START_BLOCK` and the contract metadata in the `store_token` function.
 
-### Update the CONTRACT_ADDRESS & START_BLOCK variables in `src/utils/constants.rs`
+### 1. Update the CONTRACT_ADDRESS & START_BLOCK variables in `src/utils/constants.rs`
 
 ```rust
 pub const CONTRACT_ADDRESS: &str = "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D";
 pub const START_BLOCK: u64 = 1521531;
 ```
 
-### Update the START_BLOCK, CONTRACT_ADDRESS and contract metadata in the store_token function
+### 2. Update the START_BLOCK, CONTRACT_ADDRESS and contract metadata in the store_token function
 
 ```rust
 #[substreams::handlers::store]
@@ -35,7 +35,7 @@ pub fn store_token(block: eth::v2::Block, o: StoreSetProto<apecoin::Token>) {
 }
 ```
 
-### Update the initialBlock params for all modules within substreams.yaml
+### 3. Update the initialBlock params for all modules within substreams.yaml
 
 ```yaml
   - name: map_transfers
@@ -47,20 +47,20 @@ pub fn store_token(block: eth::v2::Block, o: StoreSetProto<apecoin::Token>) {
       type: proto:apecoin.Transfers
 ```
 
-### Compile the Project with  `make build`
+### 4. Compile the Project with  `make build`
 
 We now need to recompile our WASM binary with the new changes we made to the rust files.
 
-### Pack the spkg with `make package`
+### 5. Pack the spkg with `make package`
 
 We need to bundle the protobuf definitions and the WASM binary into a single file. This is what we will deploy the subgraph.
 
-### Deploy the subgraph with `graph deploy`
+### 6. Deploy the subgraph with `graph deploy`
 
 Modify the package.json to point to your subgraph name and endpoint.
 This endpoint will change if you are deploying to the hosted service or decentralized network. But replace this with the command that is appropriate for your setup.
 
-### Schema
+### 7. Schema
 
 ```graphql
 type Account @entity {
@@ -106,7 +106,7 @@ type Token @entity {
 }
 ```
 
-7. Data Flow
+### 8. Data Flow
 
 ```mermaid
 graph TD;
