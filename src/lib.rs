@@ -9,8 +9,8 @@ use abi::abi::apecoin::v1 as apecoin_events;
 
 use pb::eth::apecoin::v1 as apecoin;
 use substreams::pb::substreams::store_delta::Operation;
-use substreams::scalar::BigInt;
-use substreams::store::{DeltaBigInt, StoreAdd, StoreAddBigInt};
+use substreams::scalar::BigDecimal;
+use substreams::store::{DeltaBigDecimal, StoreAdd, StoreAddBigDecimal};
 use substreams::{
     log,
     store::{DeltaProto, Deltas, StoreNew, StoreSet, StoreSetProto},
@@ -19,7 +19,7 @@ use substreams::{
 
 use substreams_entity_change::{pb::entity::EntityChanges, tables::Tables};
 use substreams_ethereum::pb::eth;
-use utils::constants::APECOIN_CONTRACT;
+use utils::constants::{CONTRACT_ADDRESS, START_BLOCK};
 
 use substreams::errors::Error;
 
@@ -27,7 +27,7 @@ use substreams::errors::Error;
 pub fn map_transfer(block: eth::v2::Block) -> Result<apecoin::Transfers, Error> {
     Ok(apecoin::Transfers {
         transfers: block
-            .events::<apecoin_events::events::Transfer>(&[&APECOIN_CONTRACT])
+            .events::<apecoin_events::events::Transfer>(&[&CONTRACT_ADDRESS])
             .map(|(transfer, log)| {
                 log::info!("Apecoin transfer seen");
 
@@ -53,9 +53,9 @@ pub fn map_transfer(block: eth::v2::Block) -> Result<apecoin::Transfers, Error> 
 pub fn map_approval(block: eth::v2::Block) -> Result<apecoin::Approvals, Error> {
     Ok(apecoin::Approvals {
         approvals: block
-            .events::<apecoin_events::events::Approval>(&[&APECOIN_CONTRACT])
+            .events::<apecoin_events::events::Approval>(&[&CONTRACT_ADDRESS])
             .map(|(approval, log)| {
-                log::info!("Apecoin transfer seen");
+                log::info!("Apecoin approval seen");
 
                 apecoin::Approval {
                     spender: append_0x(&Hex(approval.spender).to_string()),
@@ -74,28 +74,31 @@ pub fn map_approval(block: eth::v2::Block) -> Result<apecoin::Approvals, Error> 
 }
 
 #[substreams::handlers::store]
-pub fn store_account_holdings(i0: apecoin::Transfers, o: StoreAddBigInt) {
+pub fn store_account_holdings(i0: apecoin::Transfers, o: StoreAddBigDecimal) {
     for transfer in i0.transfers {
+        let val_dec = BigDecimal::from_str(transfer.amount.as_str())
+            .unwrap()
+            .with_prec(100);
         o.add(
             0,
             format!("Account: {}", &transfer.from.as_ref().unwrap().address),
-            BigInt::from_str(transfer.amount.as_str()).unwrap().neg(),
+            val_dec.neg(),
         );
 
         o.add(
             0,
             format!("Account: {}", &transfer.to.as_ref().unwrap().address),
-            BigInt::from_str(transfer.amount.as_str()).unwrap(),
+            val_dec,
         );
     }
 }
 
 #[substreams::handlers::store]
 pub fn store_token(block: eth::v2::Block, o: StoreSetProto<apecoin::Token>) {
-    if block.number == 14204533 as u64 {
+    if block.number == START_BLOCK {
         let token = &apecoin::Token {
             name: "Apecoin".to_string(),
-            address: append_0x(Hex(APECOIN_CONTRACT).to_string().as_str()),
+            address: append_0x(Hex(CONTRACT_ADDRESS).to_string().as_str()),
             decimal: "18".to_string(),
             symbol: "Ape".to_string(),
         };
@@ -107,7 +110,7 @@ pub fn store_token(block: eth::v2::Block, o: StoreSetProto<apecoin::Token>) {
 pub fn graph_out(
     transfers: apecoin::Transfers,
     approvals: apecoin::Approvals,
-    account_holdings: Deltas<DeltaBigInt>,
+    account_holdings: Deltas<DeltaBigDecimal>,
     tokens: Deltas<DeltaProto<apecoin::Token>>,
 ) -> Result<EntityChanges, Error> {
     let mut tables = Tables::new();
@@ -135,6 +138,10 @@ pub fn graph_out(
 
         row.set("sender", &transfer.from.as_ref().unwrap().address);
         row.set("receiver", &transfer.to.as_ref().unwrap().address);
+        row.set(
+            "token",
+            append_0x(Hex(CONTRACT_ADDRESS).to_string().as_str()),
+        );
         row.set("timestamp", transfer.timestamp);
         row.set("blockNumber", transfer.block_number);
         row.set("logIndex", transfer.log_index);
@@ -149,6 +156,10 @@ pub fn graph_out(
         row.set("owner", &approval.owner.as_ref().unwrap().address);
         row.set("timestamp", approval.timestamp);
         row.set("spender", &approval.spender);
+        row.set(
+            "token",
+            append_0x(Hex(CONTRACT_ADDRESS).to_string().as_str()),
+        );
         row.set("blockNumber", approval.block_number);
         row.set("logIndex", approval.log_index);
         row.set("txHash", &approval.tx_hash);

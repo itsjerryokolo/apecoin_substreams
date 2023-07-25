@@ -1,6 +1,9 @@
 type Account @entity {
   id: ID!
-  holdings: BigInt!
+  holdings: BigDecimal!
+  sent: [Transfer!]! @derivedFrom(field: "sender")
+  received: [Transfer!]! @derivedFrom(field: "receiver")
+  approvals: [Approval!]! @derivedFrom(field: "owner")
 }
 
 type Transfer @entity(immutable: true) {
@@ -8,6 +11,7 @@ type Transfer @entity(immutable: true) {
   sender: Account
   receiver: Account!
   amount: String!
+  token: Token!
   timestamp: BigInt!
   txHash: String!
   blockNumber: BigInt!
@@ -20,6 +24,7 @@ type Approval @entity(immutable: true) {
   owner: Account!
   amount: String!
   timestamp: BigInt!
+  token: Token!
   txHash: String!
   blockNumber: BigInt!
   logIndex: BigInt!
@@ -31,4 +36,6 @@ type Token @entity {
   address: String!
   symbol: String!
   decimals: String!
+  transfers: [Token!]! derivedFrom(field: "token")
+  approvals: [Token!]! derivedFrom(field: "token")
 }
