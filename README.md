@@ -1,15 +1,15 @@
 # Apecoin Substreams
 
+Although this substreams is tracking the Apecoin Contract, you can use this as a template for any ERC20 token. You will need to update the `CONTRACT_ADDRESS`, `START_BLOCK` and the contract metadata in the `store_token` function to match your token.
+
 ## Quickstart
 
 Make sure you have the latest versions of the following installed:
 
-- Rust
-- Make
-- graph-cli
-- substreams-cli
-
-Although this substreams is tracking the Apecoin Contract, you can use this as a template for any ERC20 token. You will need to update the `CONTRACT_ADDRESS`, `START_BLOCK` and the contract metadata in the `store_token` function.
+- [Rust](https://rustup.rs/)
+- [Make](https://formulae.brew.sh/formula/make)
+- [graph-cli](https://thegraph.com/docs/en/cookbook/quick-start/#2-install-the-graph-cli)
+- [substreams-cli](https://substreams.streamingfast.io/getting-started/installing-the-cli)
 
 ### 1. Update the CONTRACT_ADDRESS & START_BLOCK variables in `src/utils/constants.rs`
 
@@ -57,7 +57,7 @@ We need to bundle the protobuf definitions and the WASM binary into a single fil
 
 ### 6. Deploy the subgraph with `graph deploy`
 
-Modify the package.json to point to your subgraph name and endpoint.
+Modify the package.json to point to your subgraph.
 This endpoint will change if you are deploying to the hosted service or decentralized network. But replace this with the command that is appropriate for your setup.
 
 ### 7. Schema
@@ -65,7 +65,7 @@ This endpoint will change if you are deploying to the hosted service or decentra
 ```graphql
 type Account @entity {
   id: ID!
-  holdings: BigInt!
+  holdings: BigDecimal!
   sent: [Transfer!]! @derivedFrom(field: "sender")
   received: [Transfer!]! @derivedFrom(field: "receiver")
   approvals: [Approval!]! @derivedFrom(field: "owner")
@@ -101,8 +101,8 @@ type Token @entity {
   address: String!
   symbol: String!
   decimals: String!
-  transfers: [Token!]! derivedFrom(field: "token")
-  approvals: [Token!]! derivedFrom(field: "token")
+  transfers: [Transfer!]! @derivedFrom(field: "token")
+  approvals: [Approval!]! @derivedFrom(field: "token")
 }
 ```
 
